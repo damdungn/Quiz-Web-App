@@ -1,0 +1,23 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/dungnguyen/Quiz-Web-App/Quiz_Web_App/.claude/hooks/format.sh",
+            "timeout": 30,
+            "statusMessage": "Formatting with Prettier..."
+          },
+          {
+            "type": "command",
+            "command": "bash /Users/dungnguyen/Quiz-Web-App/Quiz_Web_App/.claude/hooks/build-check.sh",
+            "timeout": 60,
+            "statusMessage": "Running build check..."
+          }
+        ]
+      }
+    ]
+  }
+}

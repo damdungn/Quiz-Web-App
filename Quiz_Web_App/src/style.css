@@ -1,0 +1,506 @@
+/*
+ * Design tokens
+ * -------------
+ * A sage-green, mountain-meadow palette: a muted forest-sage primary,
+ * crisp near-black/near-white text, and success/danger/streak accents
+ * that stay legible against their own tinted backgrounds. `--success`
+ * is deliberately a brighter, more saturated green than `--primary`'s
+ * muted sage so a correct-answer flash still reads as distinct feedback
+ * rather than blending into the chrome. Spacing and radius are on a
+ * small consistent scale so cards/buttons/chips read as one system
+ * rather than one-off values.
+ */
+:root {
+  --bg: #f4f6f1;
+  --surface: #ffffff;
+  --surface-muted: #eaf0e6;
+  --border: #d7e0d1;
+  --text: #55654f;
+  --text-h: #202b1c;
+  --text-muted: #74836d;
+
+  --primary: #5b7f52;
+  --primary-strong: #46643e;
+  --primary-bg: rgba(91, 127, 82, 0.12);
+  --primary-border: rgba(91, 127, 82, 0.45);
+  /* Text/icon color for content sitting on a solid --primary background
+     (e.g. the Play Again button) — kept as its own token because
+     --primary flips from dark (light mode) to light (dark mode), so a
+     fixed white wouldn't stay readable in both. */
+  --on-primary: #ffffff;
+
+  --success: #2f9e44;
+  --success-text: #1f7a32;
+  --success-bg: rgba(47, 158, 68, 0.16);
+
+  --danger: #dc2626;
+  --danger-text: #b91c1c;
+  --danger-bg: rgba(220, 38, 38, 0.16);
+
+  --warning: #b7791d;
+  --warning-text: #8a5a14;
+  --warning-bg: rgba(183, 121, 29, 0.14);
+
+  --shadow-sm: 0 1px 2px rgba(21, 15, 36, 0.06);
+  --shadow-md:
+    0 1px 2px rgba(21, 15, 36, 0.06), 0 12px 28px -10px rgba(21, 15, 36, 0.18);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 28px;
+  --space-7: 40px;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --display: ui-rounded, 'SF Pro Rounded', 'Segoe UI Rounded', system-ui, -apple-system, 'Segoe UI',
+    Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  font: 17px/155% var(--sans);
+  letter-spacing: 0.1px;
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #10160d;
+    --surface: #1a2216;
+    --surface-muted: #212b1c;
+    --border: #34422c;
+    --text: #b7c4ae;
+    --text-h: #eff5ea;
+    --text-muted: #8ca083;
+
+    --primary: #9cc98a;
+    --primary-strong: #b6dba8;
+    --primary-bg: rgba(156, 201, 138, 0.16);
+    --primary-border: rgba(156, 201, 138, 0.5);
+    /* --primary is a light sage here, so its on-primary text needs to be
+       dark, not white — see the light-mode definition for why this is a
+       separate token. */
+    --on-primary: #12190f;
+
+    --success: #4ade80;
+    --success-text: #4ade80;
+    --success-bg: rgba(74, 222, 128, 0.2);
+
+    --danger: #f87171;
+    --danger-text: #f87171;
+    --danger-bg: rgba(248, 113, 113, 0.2);
+
+    --warning: #e0a94d;
+    --warning-text: #e0a94d;
+    --warning-bg: rgba(224, 169, 77, 0.18);
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 32px -12px rgba(0, 0, 0, 0.55);
+  }
+}
+
+body {
+  margin: 0;
+}
+
+h1 {
+  font-family: var(--display);
+  font-weight: 700;
+  color: var(--text-h);
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+code {
+  font-family: var(--mono);
+  display: inline-flex;
+  border-radius: var(--radius-sm);
+  color: var(--text-h);
+  font-size: 15px;
+  line-height: 135%;
+  padding: 4px 8px;
+  background: var(--surface-muted);
+}
+
+/* Layout: the whole app is one centered "game card" floating on the page
+   background, rather than a full-bleed document. */
+#app {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  min-height: 100svh;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+}
+
+.quiz {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-6) var(--space-5);
+
+  @media (max-width: 480px) {
+    padding: var(--space-5) var(--space-4);
+    border-radius: var(--radius-md);
+  }
+}
+
+/* --- HUD: progress, score, streak and the countdown, grouped into one
+   scannable panel above the question. --- */
+.quiz-status {
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.quiz-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.quiz-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.quiz-category {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.quiz-progress {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.quiz-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+.quiz-score,
+.quiz-streak {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  padding: 5px 11px;
+  border-radius: var(--radius-pill);
+}
+
+.quiz-score {
+  background: var(--primary-bg);
+  color: var(--primary-strong);
+}
+
+.quiz-streak {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+}
+
+.quiz-timer-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.quiz-timer {
+  flex: 1;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--border);
+  overflow: hidden;
+}
+
+.quiz-timer-bar {
+  height: 100%;
+  width: 100%;
+  background: var(--primary);
+  border-radius: var(--radius-pill);
+  transition:
+    width 1s linear,
+    background-color 0.3s;
+}
+
+.quiz-timer-label {
+  min-width: 2.5em;
+  text-align: right;
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+/* --- Headline text, shared by the difficulty, question, and results
+   screens. --- */
+.quiz-question {
+  font-size: clamp(22px, 5vw, 30px);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--space-5);
+}
+
+.quiz-subtitle {
+  color: var(--text);
+  margin: calc(-1 * var(--space-4)) 0 var(--space-5);
+}
+
+/* --- Answer / difficulty options --- */
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.quiz-option {
+  font: inherit;
+  text-align: left;
+  color: var(--text-h);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s,
+    box-shadow 0.15s,
+    transform 0.15s;
+
+  &:hover {
+    border-color: var(--primary-border);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+  }
+  &:active {
+    transform: translateY(0);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+/* Shared two-line layout for the category and difficulty option buttons
+   (a title plus a small meta line), as opposed to the plain single-line
+   answer option buttons used during the quiz itself. */
+.quiz-option-stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.quiz-option-title {
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.quiz-option-meta {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.quiz-options-locked .quiz-option {
+  pointer-events: none;
+}
+
+.quiz-option-correct {
+  border-color: var(--success);
+  animation: quiz-flash-correct 700ms ease-out forwards;
+}
+
+.quiz-option-wrong {
+  border-color: var(--danger);
+  animation:
+    quiz-flash-wrong 700ms ease-out forwards,
+    quiz-shake 400ms ease-in-out;
+}
+
+@keyframes quiz-flash-correct {
+  0% {
+    background-color: transparent;
+  }
+  25% {
+    background-color: var(--success-bg);
+  }
+  100% {
+    background-color: var(--success-bg);
+  }
+}
+
+@keyframes quiz-flash-wrong {
+  0% {
+    background-color: transparent;
+  }
+  25% {
+    background-color: var(--danger-bg);
+  }
+  100% {
+    background-color: var(--danger-bg);
+  }
+}
+
+@keyframes quiz-shake {
+  10%,
+  90% {
+    transform: translateX(-2px);
+  }
+  20%,
+  80% {
+    transform: translateX(3px);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translateX(-6px);
+  }
+  40%,
+  60% {
+    transform: translateX(6px);
+  }
+}
+
+.confetti-burst {
+  position: fixed;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 10px;
+  border-radius: 1px;
+  animation: quiz-confetti-fly 700ms ease-out forwards;
+}
+
+@keyframes quiz-confetti-fly {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--rot));
+    opacity: 0;
+  }
+}
+
+/* --- Results screen --- */
+.quiz-results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  text-align: center;
+}
+
+.quiz-results-secondary {
+  display: flex;
+  gap: var(--space-3);
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+  }
+}
+
+.quiz-result {
+  flex: 1;
+  padding: var(--space-4);
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.quiz-result-value {
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-h);
+  margin-bottom: 2px;
+}
+
+.quiz-result-primary .quiz-result-value {
+  font-size: clamp(19px, 5.5vw, 26px);
+}
+
+.quiz-result-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.quiz-play-again {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  font-weight: 700;
+  color: var(--on-primary);
+  background: var(--primary);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: var(--space-4);
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    transform 0.15s;
+
+  &:hover {
+    background: var(--primary-strong);
+    transform: translateY(-1px);
+  }
+  &:active {
+    transform: translateY(0);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
